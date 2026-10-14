@@ -1,0 +1,13 @@
+{
+  "name": "English Word Master",
+  "short_name": "Word Master",
+  "description": "English vocabulary with Bangla meanings and grammar notes",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f7f4",
+  "theme_color": "#173f35",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}

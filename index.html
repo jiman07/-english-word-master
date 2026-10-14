@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#173f35">
+<meta name="description" content="English Word Master: English vocabulary and grammar with Bangla meanings for HSC and admission preparation.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>English Word Master</title>
+<style>
+:root{--bg:#f3f7f4;--card:#fff;--ink:#142a24;--muted:#60756c;--brand:#173f35;--accent:#d9f2df;--line:#dce7df;--warn:#fff2d4}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:var(--brand);color:white;padding:25px 18px 28px;border-radius:0 0 25px 25px}
+.wrap{max-width:820px;margin:auto}header .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}h1{font-size:28px;line-height:1.15;margin:8px 0}header p{margin:0;color:#e1eee7}
+main{padding:18px 14px 40px}.search-card,.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin-bottom:14px;box-shadow:0 3px 12px #153b2c08}
+label{font-size:13px;font-weight:700;display:block;margin-bottom:7px}form{display:flex;gap:8px}input{min-width:0;flex:1;padding:13px 14px;border:1px solid #b9cbc0;border-radius:12px;font:inherit;outline-color:var(--brand)}button{border:0;border-radius:12px;background:var(--brand);color:white;padding:12px 16px;font:600 15px system-ui;cursor:pointer}button:disabled{opacity:.55}.subbtn{background:var(--accent);color:var(--brand);padding:8px 11px;font-size:13px}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.chip{border:1px solid var(--line);background:#f7faf8;color:var(--ink);border-radius:99px;padding:6px 10px;font-size:13px}
+#status{font-size:13px;color:var(--muted);margin-top:10px}.wordtop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.word{font-size:31px;font-weight:800;line-height:1.1;overflow-wrap:anywhere}.phon{color:var(--muted);margin-top:5px}.pill{display:inline-block;background:var(--accent);color:#20503b;border-radius:7px;padding:3px 8px;font-size:12px;margin:3px 4px 0 0}
+h2{font-size:17px;margin:0 0 10px}.section{margin-top:15px}.section p{margin:6px 0}.muted{color:var(--muted)}ul{padding-left:21px;margin:7px 0}li{margin:5px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid .card{margin:0}.notice{background:var(--warn);border-radius:10px;padding:10px 12px;font-size:13px}.small{font-size:13px}.empty{padding:20px;text-align:center;color:var(--muted)}footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 18px 30px}a{color:#1e6952}
+@media(max-width:560px){form{flex-direction:column}form button{width:100%}.grid{grid-template-columns:1fr}.word{font-size:27px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="eyebrow">HSC • Medical Admission • Vocabulary</div><h1>English Word Master</h1><p>একটি শব্দ লিখো, vocabulary ও grammar শিখো।</p></div></header>
+<main class="wrap">
+<section class="search-card">
+<label for="wordInput">Search an English word</label>
+<form id="searchForm"><input id="wordInput" value="shrew" placeholder="e.g. benevolent, abundant, shrew" autocomplete="off" required><button id="searchBtn">Search word</button></form>
+<div class="chips"><button class="chip" type="button" data-word="like">like</button><button class="chip" type="button" data-word="benevolent">benevolent</button><button class="chip" type="button" data-word="abundant">abundant</button><button class="chip" type="button" data-word="shrew">shrew</button></div>
+<div id="status" role="status">Online search ব্যবহার করতে ইন্টারনেট চালু রাখো।</div>
+</section>
+<div id="result"><div class="card empty">উপরের Search চাপলে শব্দের analysis এখানে দেখাবে।</div></div>
+<section class="card small"><strong>নোট:</strong> বাংলা অনুবাদ ও dictionary তথ্য অনলাইন public APIs থেকে আসে; সব শব্দের gender, antonym বা word family থাকে না। যেখানে তথ্য পাওয়া যায় না, সেখানে তা স্পষ্ট করে দেখানো হবে। API-তে সাময়িক সমস্যা হলে আবার চেষ্টা করো।</section>
+</main>
+<footer>English Word Master • Learning tool for personal study</footer>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uniq=a=>[...new Set((a||[]).filter(Boolean))];
+function list(items){return items&&items.length?'<ul>'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p class="muted">নির্ভরযোগ্য তথ্য পাওয়া যায়নি / Not available.</p>'}
+function card(title,body){return '<section class="card"><h2>'+title+'</h2>'+body+'</section>'}
+async function translate(text){
+ if(!text)return '';
+ try{const u='https://api.mymemory.translated.net/get?q='+encodeURIComponent(text.slice(0,450))+'&langpair=en|bn';const r=await fetch(u);if(!r.ok)return '';const j=await r.json();return j.responseData?.translatedText||''}catch{return ''}
+}
+function fallbackForms(word, pos){
+ const w=word.toLowerCase();
+ const noun=/noun/.test(pos), verb=/verb/.test(pos), adj=/adjective/.test(pos), adv=/adverb/.test(pos);
+ let forms=[];
+ if(noun){forms.push('Singular: '+w,'Plural: '+(w.endsWith('s')?w+' (check dictionary)':/[sxz]$|ch$|sh$/.test(w)?w+'es':/[^aeiou]y$/.test(w)?w.slice(0,-1)+'ies':w+'s'));}
+ if(verb){let past=/e$/.test(w)?w+'d':/[^aeiou]y$/.test(w)?w.slice(0,-1)+'ied':w+'ed';forms.push('V1: '+w,'V2: '+past,'V3: '+past,'V4: '+(/ie$/.test(w)?w.slice(0,-2)+'ying':/e$/.test(w)&&!/(ee|ye|oe)$/.test(w)?w.slice(0,-1)+'ing':w+'ing'),'V5: '+(/s$|sh$|ch$|x$|z$|o$/.test(w)?w+'es':/[^aeiou]y$/.test(w)?w.slice(0,-1)+'ies':w+'s'));}
+ if(adj){forms.push('Comparative: '+(w.length<7?w+'er':'more '+w),'Superlative: '+(w.length<7?w+'est':'most '+w));}
+ return forms;
+}
+async function search(word){
+ word=word.trim().toLowerCase(); if(!word)return;
+ $('#wordInput').value=word;$('#searchBtn').disabled=true;$('#status').textContent='Searching dictionary and Bangla meaning…';$('#result').innerHTML='<div class="card empty">শব্দের তথ্য খোঁজা হচ্ছে…</div>';
+ try{
+  const r=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(word));
+  if(!r.ok)throw new Error(r.status===404?'এই শব্দটির dictionary entry পাওয়া যায়নি। বানান পরীক্ষা করো।':'Dictionary service unavailable.');
+  const data=await r.json();const entry=data[0]||{};const phon=uniq((data||[]).flatMap(e=>(e.phonetics||[]).map(p=>p.text))).join(' · ')||'Not available';
+  const audio=(data||[]).flatMap(e=>e.phonetics||[]).find(p=>p.audio)?.audio;
+  const meanings=(data||[]).flatMap(e=>e.meanings||[]);
+  const pos=uniq(meanings.map(m=>m.partOfSpeech)); const defs=meanings.flatMap(m=>(m.definitions||[]).map(d=>({pos:m.partOfSpeech,def:d.definition,ex:d.example,syn:[...(d.synonyms||[]),...(m.synonyms||[])],ant:[...(d.antonyms||[]),...(m.antonyms||[])]})));
+  const enDefs=defs.slice(0,7).map(d=>d.pos+': '+d.def+(d.ex?' — Example: '+d.ex:''));
+  const bnDefs=[];for(const d of defs.slice(0,5)){const tr=await translate(d.def);if(tr)bnDefs.push(tr+(d.pos?' ('+d.pos+')':''));}
+  const syn=uniq(defs.flatMap(d=>d.syn)); const ant=uniq(defs.flatMap(d=>d.ant));
+  const sentence=defs.find(d=>d.ex)?.ex;
+  const noun=pos.includes('noun'),verb=pos.includes('verb'),adj=pos.includes('adjective'),adv=pos.includes('adverb');
+  const forms=[];
+  if(noun){forms.push('Singular: '+word,'Plural (regular estimate): '+(/[^aeiou]y$/.test(word)?word.slice(0,-1)+'ies':/[sxz]$|ch$|sh$/.test(word)?word+'es':word+'s'));}else forms.push('Number: N/A — dictionary entry-তে noun হিসেবে চিহ্নিত নয়।');
+  if(verb){const v=fallbackForms(word,'verb');forms.push(...v)}else forms.push('Verb forms V1–V5: N/A — verb হিসেবে চিহ্নিত নয়।');
+  const fam=[];
+  if(adj){fam.push(word+' (adjective)');}
+  if(verb){fam.push(word+' (verb)');}
+  if(noun){fam.push(word+' (noun)');}
+  if(!fam.length)fam.push('Related forms may include noun/adjective/adverb forms; dictionary does not guarantee a complete word family.');
+  const gender=noun?'Most English nouns have no grammatical gender. For a person/animal, biological sex depends on context; use male/female '+word+' if relevant.':'Gender: N/A for this part of speech.';
+  $('#result').innerHTML=
+   '<section class="card"><div class="wordtop"><div><div class="word">'+esc(word)+'</div><div class="phon">'+esc(phon)+'</div><div>'+pos.map(p=>'<span class="pill">'+esc(p)+'</span>').join('')+'</div></div>'+(audio?'<button class="subbtn" id="playAudio" type="button">🔊 Listen</button>':'')+'</div><div class="section"><h2>বাংলা অর্থ • Bangla meaning</h2><div id="banglaDefs">'+(bnDefs.length?list(bnDefs):'<p class="muted">বাংলা অনুবাদ পাওয়া যায়নি; নিচের English definitions দেখো।</p>')+'</div></div><div class="section"><h2>English definitions</h2>'+list(enDefs)+'</div></section>'+
+   '<div class="grid">'+
+   '<div>'+card('Parts of Speech',list(pos.map(p=>p+' — see definitions above; usage depends on context.')))+card('Synonyms • সমার্থক শব্দ',list(syn.slice(0,25)))+'</div>'+
+   '<div>'+card('Antonyms • বিপরীতার্থক শব্দ',list(ant.slice(0,25)))+card('Gender & Number', '<p>'+esc(gender)+'</p>'+list(noun?['Singular: '+word,'Regular plural estimate: '+forms.find(x=>x.startsWith('Plural'))?.replace('Plural (regular estimate): ','')].filter(Boolean):['Number: Not applicable unless used as a noun.']))+'</div></div>'+
+   card('Verb forms (V1–V5)',list(verb?forms.filter(x=>/^V[1-5]:/.test(x)):['Not applicable: no verb sense identified in this dictionary result.']))+
+   card('Word family & related forms',list(fam.concat(adj?['Adjective: '+word]:[],adv?['Adverb: '+word]:[])))+
+   card('Examples',list(uniq(defs.filter(d=>d.ex).map(d=>d.ex)).slice(0,5).concat(sentence?[]:[])))+
+   card('Collocations & phrases','<p class="muted">এই public dictionary API সব collocation বা idiom দেয় না। Definition-এর শব্দ ও example থেকে phrase শিখো; যাচাই ছাড়া phrase বানিয়ে দেওয়া হয়নি।</p>')+
+   card('HSC / Medical Admission Notes','<ul><li>Part of speech ও context অনুযায়ী অর্থ মনে রাখো।</li><li>Synonym/antonym কেবল এখানে পাওয়া গেলে দেখানো হয়েছে; সব শব্দের antonym থাকে না।</li><li>Irregular verb হলে regular rule দিয়ে বানানো forms ভুল হতে পারে—dictionary দিয়ে যাচাই করো।</li><li>Exam tip: word family, sentence usage, countability ও spelling একসঙ্গে revise করো।</li></ul>');
+  if(audio){$('#playAudio').onclick=()=>new Audio(audio).play();}
+  $('#status').textContent='Done • '+word+' | Dictionary and translation results may vary.';
+ }catch(e){$('#result').innerHTML='<div class="card"><h2>Search হয়নি</h2><p>'+esc(e.message||'Network error')+'</p><p class="muted">ইন্টারনেট চালু আছে কি না এবং শব্দের বানান পরীক্ষা করে আবার চেষ্টা করো।</p></div>';$('#status').textContent='Search failed.';}
+ finally{$('#searchBtn').disabled=false}
+}
+$('#searchForm').addEventListener('submit',e=>{e.preventDefault();search($('#wordInput').value)});
+document.querySelectorAll('[data-word]').forEach(b=>b.addEventListener('click',()=>search(b.dataset.word)));
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
